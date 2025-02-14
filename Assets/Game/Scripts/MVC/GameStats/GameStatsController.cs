@@ -25,11 +25,13 @@ public class GameStatsController : ControllerBase
     private void OnEnable()
     {
         EventManager.OnStageStarted += MatchStarted;
+        EventManager.OnStageFinished += OnStageFinished;
     }
 
     private void OnDisable()
     {
         EventManager.OnStageStarted -= MatchStarted;
+        EventManager.OnStageFinished -= OnStageFinished;
     }
 
     #endregion
@@ -53,7 +55,26 @@ public class GameStatsController : ControllerBase
         
         _view.SetViewAlpha(1);
         _view.TurnGeneralContainer(true);
+        _view.TurnBackToMainMenuButton(true);
     }
-    
+
+    private void OnStageFinished() 
+    {
+        _view.TurnBackToMainMenuButton(false);
+    }
+
+    #endregion
+
+
+    #region Button callbacks
+
+    public void OnBackToMainMenuButtonClick() 
+    {
+        EventManager.StageLeaved();
+
+        _view.SetViewAlpha(0);
+        _view.TurnGeneralContainer(false);
+    }
+
     #endregion
 }

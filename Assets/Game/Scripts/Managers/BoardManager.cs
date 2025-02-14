@@ -38,13 +38,15 @@ public class BoardManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.OnStageStarted += MatchStarted;
+        EventManager.OnStageStarted += StageStarted;
+        EventManager.OnStageLeaved += StageLeaved;
         EventManager.OnCardRotated += CardRotated;
     }
 
     private void OnDisable()
     {
-        EventManager.OnStageStarted -= MatchStarted;
+        EventManager.OnStageStarted -= StageStarted;
+        EventManager.OnStageLeaved -= StageLeaved;
         EventManager.OnCardRotated -= CardRotated;
     }
 
@@ -76,7 +78,7 @@ public class BoardManager : MonoBehaviour
 
     #region Event callbacks
 
-    private async void MatchStarted(EventManager.StageData pData)
+    private async void StageStarted(EventManager.StageData pData)
     {
         _currentDifficulty = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(Difficulty => Difficulty.Id == pData.DifficultyId);
 
@@ -94,6 +96,12 @@ public class BoardManager : MonoBehaviour
         EventManager.GenerateSound(_cardSetting.SoundOnRotate);
         foreach (var item in _currentcards)
             item.RotateToFaceDown(false);
+    }
+
+    private void StageLeaved() 
+    {
+        _gridLayoutResizer.SetState(false);
+        CleanBoardCards();
     }
 
     private async void CardRotated(CardController pCard)

@@ -26,12 +26,13 @@ public class MainMenuController : ControllerBase
     private void OnEnable()
     {
         EventManager.OnGameStarted += StartGame;
+        EventManager.OnStageLeaved += StageLeaved;
     }
 
     private void OnDisable()
     {
         EventManager.OnGameStarted -= StartGame;
-
+        EventManager.OnStageLeaved -= StageLeaved;
     }
 
     #endregion
@@ -63,6 +64,12 @@ public class MainMenuController : ControllerBase
     #region EventCallbacks
 
     private void StartGame()
+    {
+        _view.TurnGeneralContainer(true);
+        _view.SetViewAlpha(1);
+    }
+
+    private void StageLeaved() 
     {
         _view.TurnGeneralContainer(true);
         _view.SetViewAlpha(1);

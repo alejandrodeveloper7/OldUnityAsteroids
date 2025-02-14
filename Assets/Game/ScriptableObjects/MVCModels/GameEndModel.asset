@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5d7d7e7eae83c444a78d17c43e7d4dd, type: 3}
   m_Name: GameEndModel
   m_EditorClassIdentifier: 
+  TimeBeforeBackToMaimMenuButtonAppears: 0.5
+  BackToMainMenuButtonApperanceDuration: 0.3
