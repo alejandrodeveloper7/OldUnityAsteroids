@@ -1,18 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-public class PersistentDataManager : MonoBehaviour
+public static class PersistentDataManager
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public static float ColumnsAmount { get; set; }
+    public static float RowsAmount { get; set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public static int DifficultyId { get; set; }
 }

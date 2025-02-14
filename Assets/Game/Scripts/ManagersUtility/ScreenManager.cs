@@ -1,18 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ScreenManager : MonoBehaviour
+public static class ScreenManager
 {
-    // Start is called before the first frame update
-    void Start()
+    public static void FixFrameRate(int pValue)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Application.targetFrameRate = pValue;
     }
 }

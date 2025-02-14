@@ -1,18 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private SO_GeneralSettings _generalSettings;
+
+    private void Awake()
     {
-        
+        GetReferences();
+        ScreenManager.FixFrameRate(_generalSettings.TargetFrameRate);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void GetReferences()
     {
-        
+        _generalSettings = ResourcesManager.Instance.GetScriptableObject<SO_GeneralSettings>(ScriptableObjectKeys.GENERAL_SETTINGS_KEY);
+    }
+
+    private void Start()
+    {
+        if (_generalSettings.UseSavedGameState)
+            LoadSavedGameState();
+        else
+            StartGame();
+    }
+
+    private async void StartGame()
+    {
+        await Task.Yield();
+        EventManager.GameStarted();
+    }
+
+    private void LoadSavedGameState()
+    {
+
     }
 }

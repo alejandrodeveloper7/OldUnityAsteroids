@@ -12,3 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ef915f49e1752e45aaa4eba9de95f48, type: 3}
   m_Name: MainMenuModel
   m_EditorClassIdentifier: 
+  MinColumnsValue: 0
+  MaxColumnsValue: 10
+  ColumnsMinSelectebleValue: 1
+  MinRowsValue: 0
+  MaxRowsValue: 10
+  RowsMinSelectebleValue: 1
+  DifficultyTogglePrefab: {fileID: 631289550166754642, guid: 1ec8592d618d62e4b921da65597dc7c8, type: 3}

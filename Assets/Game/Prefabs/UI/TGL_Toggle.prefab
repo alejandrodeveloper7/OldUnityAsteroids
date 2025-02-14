@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8955673319124240611}
   - component: {fileID: 2328452759477941183}
+  - component: {fileID: 970452455812662533}
   m_Layer: 5
   m_Name: TGL_Toggle
   m_TagString: Untagged
@@ -61,8 +62,8 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_HighlightedColor: {r: 0.98039216, g: 1, b: 0.45490196, a: 1}
+    m_PressedColor: {r: 1, g: 0.8352941, b: 0, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
@@ -86,7 +87,20 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
+--- !u!114 &970452455812662533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 631289550166754642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f780f516d1becc148a90544fd5a0f47c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _toggleText: {fileID: 241325983694300380}
 --- !u!1 &1120745155577258437
 GameObject:
   m_ObjectHideFlags: 0
