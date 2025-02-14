@@ -12,3 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba5c6b0878ddaf4498b68fd96ae88dff, type: 3}
   m_Name: BoardSettings
   m_EditorClassIdentifier: 
+  CardPrefab: {fileID: 6712821263281026787, guid: a606d293b02118b4c86ff319850e802a, type: 3}
+  ParentName: PooledGameObject
+  ParentPosition: {x: -20, y: 0, z: 0}
+  PoolInitialSize: 20
+  PoolIncrement: 4

@@ -12,3 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2491164edfe8e4b847a5c7c9f5d6e1, type: 3}
   m_Name: CardSettings
   m_EditorClassIdentifier: 
+  RotationDuration: 0.4
+  DissaparitionDuration: 0.2
+  TimeBeforeDissapear: 0.5
+  HoverDuration: 0.1
+  HoverScale: {x: 1.08, y: 1.08, z: 10.8}

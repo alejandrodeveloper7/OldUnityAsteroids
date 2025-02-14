@@ -7,6 +7,5 @@ public class SO_GeneralSettings : ScriptableObject
     public int TargetFrameRate;
  
     [Header("Game State")]
-    public bool SaveGameState;
     public bool UseSavedGameState; 
 }

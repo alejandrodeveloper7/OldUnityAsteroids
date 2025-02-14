@@ -75,7 +75,7 @@ public class MainMenuController : ControllerBase
     public void OnPlayButtonClick() 
     {
         PersistentDataManager.ColumnsAmount = _view.ColumnsAmount;
-        PersistentDataManager.RowsAmount = _view.ColumnsAmount;
+        PersistentDataManager.RowsAmount = _view.RowsAmount;
 
         PersistentDataManager.DifficultyId = _availableDifficulties[_view.DifficultyIndexSelected].Id;
 
