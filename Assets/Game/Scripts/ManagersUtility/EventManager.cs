@@ -22,37 +22,79 @@ public class EventManager : MonoBehaviour
 
 
 
-    public delegate void StartMatch(MatchData data);
-    public static event StartMatch OnMatchStarted = (data) => { };
-    public class MatchData
+    public delegate void StartStage(StageData pData);
+    public static event StartStage OnStageStarted = (data) => { };
+    public class StageData
     {
         public float ColumnsAmount;
         public float RowsAmount;
         public int DifficultyId;
     }
-    public static void MatchStarted(MatchData pData)
+    public static void StageStarted(StageData pData)
     {
-        Debug.Log("--- Match Started");
-        OnMatchStarted.Invoke(pData);
+        Debug.Log("--- Stage Started");
+        OnStageStarted.Invoke(pData);
     }
 
 
 
-    public delegate void MatchFinish();
-    public static event MatchFinish OnMatchFinished = () => { };
-    public static void MatchFinished()
+    public delegate void StageFinish();
+    public static event StageFinish OnStageFinished = () => { };
+    public static void StageFinished()
     {
-        Debug.Log("--- Match Finished");
-        OnMatchFinished.Invoke();
+        Debug.Log("--- Stage Finished");
+        OnStageFinished.Invoke();
     }
 
 
 
-    public delegate void LeaveMatch();
-    public static event LeaveMatch OnMatchLeaved = () => { };
-    public static void MatchLeaved()
+    public delegate void LeaveStage();
+    public static event LeaveStage OnStageLeaved = () => { };
+    public static void StageLeaved()
     {
-        Debug.Log("--- Match Leaved");
-        OnMatchLeaved.Invoke();
+        Debug.Log("--- Stage Leaved");
+        OnStageLeaved.Invoke();
+    }
+
+
+
+    public delegate void RotateCard (CardController pCard);
+    public static event RotateCard OnCardRotated = (card) => { };
+    public static void CardRotated(CardController pCard)
+    {
+        OnCardRotated.Invoke(pCard);
+    }
+
+
+
+
+    public delegate void StartMatch();
+    public static event StartMatch OnStartMatch = () => { };
+    public static void MatchStarted()
+    {
+        OnStartMatch.Invoke();
+    }
+
+    public delegate void MatchSucess();
+    public static event MatchSucess OnMatchSucess = () => { };
+    public static void MatchSucessed()
+    {
+        OnMatchSucess.Invoke();
+    }
+
+    public delegate void MatchFail();
+    public static event MatchFail OnMatchFail = () => { };
+    public static void MatchFailed()
+    {
+        OnMatchFail.Invoke();
+    }
+
+
+
+    public delegate void SoundGeneration(SO_Sound pSound);
+    public static event SoundGeneration OnGenerateSound = (sound) => { };
+    public static void GenerateSound(SO_Sound pSound)
+    {
+        OnGenerateSound.Invoke(pSound);
     }
 }

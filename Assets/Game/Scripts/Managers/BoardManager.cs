@@ -14,7 +14,8 @@ public class BoardManager : MonoBehaviour
     private Transform _pooledCardsParent;
     private GameObjectPool _cardsPool;
     [Space]
-    private List<CardController> _currentcards= new List<CardController>();
+    private List<CardController> _currentcards = new List<CardController>();
+    private CardController _currentRotatedCard;
 
     [Header("Data")]
     private SO_BoardSettings _boardSettings;
@@ -37,12 +38,14 @@ public class BoardManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.OnMatchStarted += MatchStarted;
+        EventManager.OnStageStarted += MatchStarted;
+        EventManager.OnCardRotated += CardRotated;
     }
 
     private void OnDisable()
     {
-        EventManager.OnMatchStarted -= MatchStarted;
+        EventManager.OnStageStarted -= MatchStarted;
+        EventManager.OnCardRotated -= CardRotated;
     }
 
     #endregion
@@ -73,7 +76,7 @@ public class BoardManager : MonoBehaviour
 
     #region Event callbacks
 
-    private async void MatchStarted(EventManager.MatchData pData)
+    private async void MatchStarted(EventManager.StageData pData)
     {
         _currentDifficulty = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(Difficulty => Difficulty.Id == pData.DifficultyId);
 
@@ -87,15 +90,55 @@ public class BoardManager : MonoBehaviour
 
         await Task.Delay((int)(_currentDifficulty.InitialCardsShowTime * 1000));
 
+        //This is to avoid reproduce the rotation sound multiple times at the same time
+        EventManager.GenerateSound(_cardSetting.SoundOnRotate);
         foreach (var item in _currentcards)
-            item.RotateToFaceDown();
+            item.RotateToFaceDown(false);
     }
 
-        #endregion
+    private async void CardRotated(CardController pCard)
+    {
+        if (_currentRotatedCard == null)
+        {
+            _currentRotatedCard = pCard;
+            EventManager.MatchStarted();
+        }
+        else
+        {
+            if (_currentRotatedCard.CardData.Id == pCard.CardData.Id)
+            {
 
-        #region Board Management
+                _currentRotatedCard.CardMatched();
+                pCard.CardMatched();
 
-        private List<SO_Card> GetCardToUse(int pCardsAmount)
+                _currentRotatedCard = null;
+                EventManager.MatchSucessed();
+
+                await Task.Delay((int)(_cardSetting.RotationDuration * 1000));
+                EventManager.GenerateSound(_boardSettings.SoundOnMatchSuccess);
+
+                CheckBoardComplete();
+            }
+            else
+            {
+
+                _currentRotatedCard.CardNotMatched();
+                pCard.CardNotMatched();
+
+                _currentRotatedCard = null;
+                EventManager.MatchFailed();
+
+                await Task.Delay((int)(_cardSetting.RotationDuration * 1000));
+                EventManager.GenerateSound(_boardSettings.SoundOnMatchFailed);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Board Management
+
+    private List<SO_Card> GetCardToUse(int pCardsAmount)
     {
         List<SO_Card> selectedCards = _availableCards.OrderBy(Card => Random.value).Take(pCardsAmount / 2).ToList();
 
@@ -123,7 +166,7 @@ public class BoardManager : MonoBehaviour
     {
         CardController newCard = _cardsPool.GetInstance().GetComponent<CardController>();
         newCard.transform.SetParent(_cardsContainer);
-        newCard.Initialize(pCard,_cardSetting);
+        newCard.Initialize(pCard, _cardSetting);
         _currentcards.Add(newCard);
     }
 
@@ -135,5 +178,18 @@ public class BoardManager : MonoBehaviour
         _currentcards.Clear();
     }
 
+    private void CheckBoardComplete() 
+    {
+        foreach (var item in _currentcards)
+            if (item.IsCleaned is false)
+                return;
+
+        EventManager.GenerateSound(_boardSettings.SoundOnStageComplete);
+        Debug.Log("- BOARD CLEANED -");
+
+        EventManager.StageFinished();
+    }
+
     #endregion
+
 }

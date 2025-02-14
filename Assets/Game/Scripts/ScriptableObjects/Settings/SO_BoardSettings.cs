@@ -11,4 +11,10 @@ public class SO_BoardSettings : ScriptableObject
     [Space]
     public int PoolInitialSize;
     public int PoolIncrement;
+
+    [Header("Sound")]
+    public SO_Sound SoundOnMatchSuccess;
+    public SO_Sound SoundOnMatchFailed;
+    [Space]
+    public SO_Sound SoundOnStageComplete;
 }

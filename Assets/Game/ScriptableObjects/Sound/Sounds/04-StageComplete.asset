@@ -9,8 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b510b0e92e7be314e8dce2d4deac43a4, type: 3}
-  m_Name: MusicConfiguration
+  m_Script: {fileID: 11500000, guid: ccd689951eccfac47a1d91f0ce10c439, type: 3}
+  m_Name: 04-StageComplete
   m_EditorClassIdentifier: 
-  MusicList:
-  - {fileID: 11400000, guid: c6876a853d9e35d42b3a2b904e91d90b, type: 2}
+  Clip: {fileID: 8300000, guid: 9bf3888e0cfa3b7439de97ddc16af63c, type: 3}
+  Volume: 0.486
+  PlayOnAwake: 0
+  Loop: 0

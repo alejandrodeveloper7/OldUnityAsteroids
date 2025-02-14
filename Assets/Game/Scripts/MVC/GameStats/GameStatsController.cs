@@ -24,12 +24,12 @@ public class GameStatsController : ControllerBase
 
     private void OnEnable()
     {
-        EventManager.OnMatchStarted += MatchStarted;
+        EventManager.OnStageStarted += MatchStarted;
     }
 
     private void OnDisable()
     {
-        EventManager.OnMatchStarted -= MatchStarted;
+        EventManager.OnStageStarted -= MatchStarted;
     }
 
     #endregion
@@ -47,7 +47,7 @@ public class GameStatsController : ControllerBase
 
     #region Events Callback
     
-    private void MatchStarted(MatchData pData) 
+    private void MatchStarted(StageData pData) 
     {
         _difficultyData = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(diffuculty => diffuculty.Id == pData.DifficultyId);
         

@@ -82,7 +82,7 @@ public class MainMenuController : ControllerBase
         _view.SetViewAlpha(0);
         _view.TurnGeneralContainer(false);
 
-        EventManager.MatchStarted(new EventManager.MatchData()
+        EventManager.StageStarted(new EventManager.StageData()
         {
             ColumnsAmount = PersistentDataManager.ColumnsAmount,
             RowsAmount = PersistentDataManager.RowsAmount,

@@ -1,4 +1,6 @@
 using DG.Tweening;
+using JetBrains.Annotations;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,11 +14,13 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     [SerializeField] private Image _cardImage;
 
-    private SO_Card _cardData;
+    private SO_Card _cardData; public SO_Card CardData { get { return _cardData; } }
     private SO_CardSettings _cardSettings;
 
     private bool _isActive;
     private bool _isFaceup;
+
+    private bool _isCleaned; public bool IsCleaned { get { return _isCleaned; } }
 
     private Vector3 _faceUpRotation = new Vector3(0, 180, 0);
     private Vector3 _faceDownRotation = Vector3.zero;
@@ -33,7 +37,7 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
         _cardImage.sprite = pData.Image;
 
         _isActive = true;
-        //_isSelected = false;
+        _isFaceup = true;
 
         ReadyToUse = false;
         transform.rotation = Quaternion.Euler(_faceUpRotation);
@@ -47,7 +51,12 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_isActive)
-            Debug.Log("CLICK");
+        {
+            RotateToFaceup();
+            _isActive = false;
+            _isFaceup = true;
+            EventManager.CardRotated(this);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -80,6 +89,22 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
         gameObject.SetActive(false);
     }
 
+    public async void CardMatched()
+    {
+        _isFaceup = false;
+        _isCleaned = true;
+        await Task.Delay((int)(_cardSettings.TimeBeforeDissapear * 1000));
+        DisappearCard();
+    }
+
+    public async void CardNotMatched()
+    {
+        await Task.Delay((int)(_cardSettings.TimeBeforeBackToFaceDown * 1000));
+        _isFaceup = false;
+        RotateToFaceDown();
+        _isActive = true;
+    }
+
     #endregion
 
 
@@ -94,8 +119,11 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     }
 
-    public void RotateToFaceup()
+    public void RotateToFaceup(bool pPlaySound = true)
     {
+        if (pPlaySound)
+            EventManager.GenerateSound(_cardSettings.SoundOnRotate);
+
         transform.DORotate(_faceUpRotation, _cardSettings.RotationDuration).OnUpdate
             (() =>
             {
@@ -104,8 +132,11 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
             });
     }
 
-    public void RotateToFaceDown()
+    public void RotateToFaceDown(bool pPlaySound = true)
     {
+        if (pPlaySound)
+            EventManager.GenerateSound(_cardSettings.SoundOnRotate);
+
         transform.DORotate(_faceDownRotation, _cardSettings.RotationDuration).OnUpdate
              (() =>
              {
