@@ -3,6 +3,7 @@
 -UI and cards images are from the asset store.<br>
 -I have use several hours of the Thursday to look for the assets, sounds, font, planiffying the architecture, the scriptableobjects structure, the ui and similar preproduction tasks.<br>
 -I have used 8 hours and half hour for dinner the Friday and and 6 hours with half hour for dinner the Saturday. Like I used some hours the Thrusday for preproduction y prefer don´t do more changes. <br>
+-Is not tested in iOS.<br>
 <br>
 <br>
 With more time I would like:<br>
