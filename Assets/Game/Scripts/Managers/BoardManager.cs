@@ -95,12 +95,13 @@ public class BoardManager : MonoBehaviour
         //This is to avoid reproduce the rotation sound multiple times at the same time
         EventManager.GenerateSound(_cardSetting.SoundOnRotate);
         foreach (var item in _currentcards)
-            item.RotateToFaceDown(false);
+            item.RotateCard(false,false);
     }
 
     private void StageLeaved() 
     {
         _gridLayoutResizer.SetState(false);
+        _currentRotatedCard = null;
         CleanBoardCards();
     }
 

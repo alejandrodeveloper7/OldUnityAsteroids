@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static EventManager;
 
 [RequireComponent(typeof(MainMenuView))]
 public class MainMenuController : ControllerBase
@@ -27,12 +28,14 @@ public class MainMenuController : ControllerBase
     {
         EventManager.OnGameStarted += StartGame;
         EventManager.OnStageLeaved += StageLeaved;
+        EventManager.OnBackMainMenu += BackToMainMenu;
     }
 
     private void OnDisable()
     {
         EventManager.OnGameStarted -= StartGame;
         EventManager.OnStageLeaved -= StageLeaved;
+        EventManager.OnBackMainMenu -= BackToMainMenu;
     }
 
     #endregion
@@ -73,6 +76,12 @@ public class MainMenuController : ControllerBase
     {
         _view.TurnGeneralContainer(true);
         _view.SetViewAlpha(1);
+    }
+
+    private void BackToMainMenu() 
+    {
+        _view.SetViewAlpha(1);
+        _view.TurnGeneralContainer(true);
     }
 
     #endregion

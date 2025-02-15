@@ -57,6 +57,13 @@ public class EventManager : MonoBehaviour
     }
 
 
+    public delegate void BackMainMenu();
+    public static event BackMainMenu OnBackMainMenu = () => { };
+    public static void BackedToMainMenu()
+    {
+        OnBackMainMenu.Invoke();
+    }
+
 
     public delegate void RotateCard (CardController pCard);
     public static event RotateCard OnCardRotated = (card) => { };

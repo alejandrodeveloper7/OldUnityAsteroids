@@ -53,5 +53,7 @@ public class GameEndController : ControllerBase
 
         _view.SetViewAlpha(0);
         _view.TurnGeneralContainer(false);
+
+        EventManager.BackedToMainMenu();
     }
 }

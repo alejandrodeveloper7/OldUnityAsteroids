@@ -18,7 +18,6 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     private SO_CardSettings _cardSettings;
 
     private bool _isActive;
-    private bool _isFaceup;
 
     private bool _isCleaned; public bool IsCleaned { get { return _isCleaned; } }
 
@@ -37,10 +36,10 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
         _cardImage.sprite = pData.Image;
 
         _isActive = true;
-        _isFaceup = true;
 
         ReadyToUse = false;
         transform.rotation = Quaternion.Euler(_faceUpRotation);
+        transform.localScale=Vector3.one;
         gameObject.SetActive(true);
     }
 
@@ -54,7 +53,6 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
         {
             RotateToFaceup();
             _isActive = false;
-            _isFaceup = true;
             EventManager.CardRotated(this);
         }
     }
@@ -91,7 +89,6 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     public async void CardMatched()
     {
-        _isFaceup = false;
         _isCleaned = true;
         await Task.Delay((int)(_cardSettings.TimeBeforeDissapear * 1000));
         DisappearCard();
@@ -100,7 +97,6 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     public async void CardNotMatched()
     {
         await Task.Delay((int)(_cardSettings.TimeBeforeBackToFaceDown * 1000));
-        _isFaceup = false;
         RotateToFaceDown();
         _isActive = true;
     }
@@ -119,7 +115,16 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     }
 
-    public void RotateToFaceup(bool pPlaySound = true)
+
+    public void RotateCard(bool pFaceUp, bool pPlaySound=true) 
+    {
+        if (pFaceUp)
+            RotateToFaceup(pPlaySound);
+        else
+            RotateToFaceDown(pFaceUp);
+    }
+
+    private void RotateToFaceup(bool pPlaySound = true)
     {
         if (pPlaySound)
             EventManager.GenerateSound(_cardSettings.SoundOnRotate);
@@ -132,7 +137,7 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
             });
     }
 
-    public void RotateToFaceDown(bool pPlaySound = true)
+    private void RotateToFaceDown(bool pPlaySound = true)
     {
         if (pPlaySound)
             EventManager.GenerateSound(_cardSettings.SoundOnRotate);
@@ -143,6 +148,20 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
                  if (transform.rotation.eulerAngles.y < 90)
                      _cardImage.enabled = false;
              });
+    }
+
+    public void RotateInstantly(bool pFaceUp) 
+    {
+        if (pFaceUp) 
+        {
+            transform.rotation = Quaternion.Euler(_faceUpRotation);
+            _cardImage.enabled = true;
+        }
+        else 
+        {
+            transform.rotation = Quaternion.Euler(_faceDownRotation);
+            _cardImage.enabled = false;
+        }
     }
 
     private void DisappearCard()
