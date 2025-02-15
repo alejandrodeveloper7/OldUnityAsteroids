@@ -1,105 +1,118 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static EventManager;
 
 public class GameStateManager : MonoBehaviour
 {
+    #region Fields
+
+    [Header("References")]
     private GameState _currentGameState = new GameState();
 
+    [Header("Data")]
     private SO_GeneralSettings _generalSettings;
+
+    #endregion
+
+    #region Monobehaviour
 
     private void Awake()
     {
         GetReferences();
     }
 
-    private void GetReferences()
-    {
-        _generalSettings = ResourcesManager.Instance.GetScriptableObject<SO_GeneralSettings>(ScriptableObjectKeys.GENERAL_SETTINGS_KEY);
-    }
-
-
     private void OnEnable()
     {
-        EventManager.OnGameStateLoaded += OnGameStateLoaded;
-        EventManager.OnCleanSavedData += OnCleanSaveData;
-        EventManager.OnStageStarted += OnStageStarted;
-        EventManager.OnBoardGenerated += OnBoardGenerated;
-        EventManager.OnStageFinished += OnStageFinished;
+        EventManager.SubscribeEvent<SaveGame>(OnSaveData);
+        EventManager.SubscribeEvent<GameLoad>(OnGameLoad);
+        EventManager.SubscribeEvent<CleanSaveData>(OnCleanSaveData);
 
-        EventManager.OnStartMatch += OnMatchStarted;
-        EventManager.OnMatchSucess += OnMatchSuccesed;
-        EventManager.OnMatchFail += OnMatchFailed;
+        EventManager.SubscribeEvent<StageStart>(OnStageStart);
+        EventManager.SubscribeEvent<StageFinish>(OnStageFinish);
+        EventManager.SubscribeEvent<BoardGeneration>(OnBoardGeneration);
 
-        EventManager.OnStatsUpdate += OnStatsUpdated;
+        EventManager.SubscribeEvent<MatchStart>(OnMatchStart);
+        EventManager.SubscribeEvent<MatchSuccess>(OnMatchSuccess);
+        EventManager.SubscribeEvent<MatchFail>(OnMatchFail);
 
-        EventManager.OnSaveData += OnSaveData;
+        EventManager.SubscribeEvent<StatsUpdate>(OnStatsUpdate);
     }
 
     private void OnDisable()
     {
-        EventManager.OnGameStateLoaded -= OnGameStateLoaded;
-        EventManager.OnCleanSavedData -= OnCleanSaveData;
-        EventManager.OnStageStarted -= OnStageStarted;
-        EventManager.OnBoardGenerated -= OnBoardGenerated;
-        EventManager.OnStageFinished -= OnStageFinished;
+        EventManager.UnsubscribeEvent<SaveGame>(OnSaveData);
+        EventManager.UnsubscribeEvent<GameLoad>(OnGameLoad);
+        EventManager.UnsubscribeEvent<CleanSaveData>(OnCleanSaveData);
 
-        EventManager.OnStartMatch -= OnMatchStarted;
-        EventManager.OnMatchSucess -= OnMatchSuccesed;
-        EventManager.OnMatchFail -= OnMatchFailed;
+        EventManager.UnsubscribeEvent<StageStart>(OnStageStart);
+        EventManager.UnsubscribeEvent<StageFinish>(OnStageFinish);
+        EventManager.UnsubscribeEvent<BoardGeneration>(OnBoardGeneration);
 
-        EventManager.OnStatsUpdate -= OnStatsUpdated;
+        EventManager.UnsubscribeEvent<MatchStart>(OnMatchStart);
+        EventManager.UnsubscribeEvent<MatchSuccess>(OnMatchSuccess);
+        EventManager.UnsubscribeEvent<MatchFail>(OnMatchFail);
 
-        EventManager.OnSaveData -= OnSaveData;
-
+        EventManager.UnsubscribeEvent<StatsUpdate>(OnStatsUpdate);
     }
 
-    private void OnGameStateLoaded(GameState pData)
+    #endregion
+
+    #region Event Callbacks
+
+    private void OnSaveData(SaveGame pSaveData)
     {
-        _currentGameState = pData;
+        if (_generalSettings.SaveGameState)
+            SaveDataManager.GenerateFile(_currentGameState, _generalSettings.FileName);
     }
-
-    private void OnCleanSaveData()
+    private void OnGameLoad(GameLoad pGameLoad)
+    {
+        _currentGameState = pGameLoad.State;
+    }
+    private void OnCleanSaveData(CleanSaveData pCleanSaveData)
     {
         CleanData();
     }
 
-    private void OnStageFinished()
+    private void OnStageStart(StageStart pStageStart)
+    {
+        _currentGameState.DifficultyId = PersistentDataManager.DifficultyId;
+        _currentGameState.BoardRows = Mathf.RoundToInt(PersistentDataManager.RowsAmount);
+        _currentGameState.BoardColumns = Mathf.RoundToInt(PersistentDataManager.ColumnsAmount);
+    }
+    private void OnStageFinish(StageFinish pStageFinish)
     {
         CleanData();
-
+    }
+    private void OnBoardGeneration(BoardGeneration pBoardGeneration)
+    {
+        SaveBoard(pBoardGeneration.Board);
     }
 
-    private void OnStageStarted(StageData pData)
+    private void OnMatchStart(MatchStart pMatchStart)
     {
-        _currentGameState.DifficultyId = pData.DifficultyId;
-        _currentGameState.BoardRows = Mathf.RoundToInt(pData.RowsAmount);
-        _currentGameState.BoardColumns = Mathf.RoundToInt(pData.ColumnsAmount);
+        SaveBoard(pMatchStart.Board);
+    }
+    private void OnMatchSuccess(MatchSuccess pMatchSuccess)
+    {
+        SaveBoard(pMatchSuccess.Board);
+    }
+    private void OnMatchFail(MatchFail pMatchFail)
+    {
+        SaveBoard(pMatchFail.Board);
     }
 
-    private void OnBoardGenerated(List<CardController> pBoard)
+    private void OnStatsUpdate(StatsUpdate pStatsUpdate)
     {
-        SaveBoard(pBoard);
-    }
-    private void OnMatchStarted(List<CardController> pBoard)
-    {
-        SaveBoard(pBoard);
-    }
-    private void OnMatchSuccesed(SO_Difficulty pDifficulty, List<CardController> pBoard)
-    {
-        SaveBoard(pBoard);
-    }
-    private void OnMatchFailed(List<CardController> pBoard)
-    {
-        SaveBoard(pBoard);
+        _currentGameState.Score = pStatsUpdate.Score;
+        _currentGameState.ComboMultiplier = pStatsUpdate.ComboMultiplier;
+        _currentGameState.Movements = pStatsUpdate.Movements;
     }
 
-    private void OnStatsUpdated(int pScore, int pComboMultiplier, int pMovement)
+    #endregion
+
+    private void GetReferences()
     {
-        _currentGameState.Score = pScore;
-        _currentGameState.ComboMultiplier = pComboMultiplier;
-        _currentGameState.Movements = pMovement;
+        _generalSettings = ResourcesManager.Instance.GetScriptableObject<SO_GeneralSettings>(ScriptableObjectKeys.GENERAL_SETTINGS_KEY);
     }
 
     private void SaveBoard(List<CardController> pBoard)
@@ -114,7 +127,6 @@ public class GameStateManager : MonoBehaviour
                 IsCleaned = card.IsCleaned,
                 IsSelected = card.IsSelected
             };
-
             _currentGameState.Cards.Add(newCardState);
         }
     }
@@ -124,14 +136,9 @@ public class GameStateManager : MonoBehaviour
         _currentGameState = new GameState();
         SaveDataManager.DeleteFile(_generalSettings.FileName);
     }
-
-    private void OnSaveData()
-    {
-        if (_generalSettings.SaveGameState)
-            SaveDataManager.SaveToJson(_currentGameState, _generalSettings.FileName);
-    }
-
 }
+
+#region Models
 
 [Serializable]
 public class GameState
@@ -152,3 +159,5 @@ public class CardState
     public bool IsCleaned;
     public bool IsSelected;
 }
+
+#endregion

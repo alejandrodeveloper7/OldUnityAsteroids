@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a56ed15d8263d43a943fc234e406aa, type: 3}
   m_Name: SoundSettings
   m_EditorClassIdentifier: 
-  PoolInitialSize: 16
+  PoolInitialSize: 12
   PoolIncrement: 4

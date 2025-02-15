@@ -1,5 +1,4 @@
 using DG.Tweening;
-using JetBrains.Annotations;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,45 +11,50 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     public bool ReadyToUse { get; set; }
     public Transform Parent { get; set; }
 
+    [Header("References")]
     [SerializeField] private Image _cardImage;
+    [Space]
+    private Vector3 _faceUpRotation = new Vector3(0, 180, 0);
+    private Vector3 _faceDownRotation = Vector3.zero;
 
+    [Header("Data")]
     private SO_Card _cardData; public SO_Card CardData { get { return _cardData; } }
     private SO_CardSettings _cardSettings;
 
+    [Header("states")]
     private bool _isActive;
     private bool _isCleaned; public bool IsCleaned { get { return _isCleaned; } }
-    private bool _isSelected; public bool IsSelected { get { return _isSelected; } set { _isSelected=value; } }
-
-
-    private Vector3 _faceUpRotation = new Vector3(0, 180, 0);
-    private Vector3 _faceDownRotation = Vector3.zero;
+    private bool _isSelected; public bool IsSelected { get { return _isSelected; } set { _isSelected = value; } }
 
     #endregion
 
     #region Intialization
 
-    public void Initialize(SO_Card pData, SO_CardSettings pSettings, bool pIsCleaned = false, bool pIsSelected = false, bool pIsNewGame=true)
+    public void Initialize(SO_Card pData, SO_CardSettings pSettings, bool pIsCleaned = false, bool pIsSelected = false, bool pIsNewGame = true)
     {
         _cardData = pData;
         _cardSettings = pSettings;
 
+
         _cardImage.sprite = pData.Image;
+
 
 
         _isSelected = pIsSelected;
         if (_isSelected)
-            RotateInstantly(true);
+            RotateCardInstantly(true);
         else
-            RotateInstantly(false);
+            RotateCardInstantly(false);
 
         if (pIsNewGame)
-            RotateInstantly(true);
+            RotateCardInstantly(true);
+
+
 
         _isCleaned = pIsCleaned;
         if (_isCleaned)
         {
-            _isActive = false;
-            transform.localScale = Vector3.zero;
+            DisappearCardInstantly();
         }
         else
         {
@@ -58,13 +62,16 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
             transform.localScale = Vector3.one;
         }
 
+
+
+
         ReadyToUse = false;
         gameObject.SetActive(true);
     }
 
     #endregion
 
-    #region Mouse Event Handlers
+    #region Interfaces event handlers
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -72,7 +79,7 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
         {
             RotateToFaceup();
             _isActive = false;
-            EventManager.CardRotated(this);
+            EventManager.RaiseEvent(new CardRotated() { CardController = this });
         }
     }
 
@@ -85,7 +92,6 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     {
         ApplyHoverState(true);
     }
-
 
     #endregion
 
@@ -124,7 +130,6 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     #endregion
 
-
     #region Movement Management
 
     private void ApplyHoverState(bool pSate)
@@ -136,19 +141,30 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     }
 
-
-    public void RotateCard(bool pFaceUp, bool pPlaySound=true) 
+    public void RotateCardInstantly(bool pFaceUp)
+    {
+        if (pFaceUp)
+        {
+            transform.rotation = Quaternion.Euler(_faceUpRotation);
+            _cardImage.enabled = true;
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(_faceDownRotation);
+            _cardImage.enabled = false;
+        }
+    }
+    public void RotateCard(bool pFaceUp, bool pPlaySound = true)
     {
         if (pFaceUp)
             RotateToFaceup(pPlaySound);
         else
             RotateToFaceDown(pFaceUp);
     }
-
     private void RotateToFaceup(bool pPlaySound = true)
     {
         if (pPlaySound)
-            EventManager.GenerateSound(_cardSettings.SoundOnRotate);
+            EventManager.RaiseEvent(new Generate2DSound() { Sound = _cardSettings.SoundOnRotate });
 
         transform.DORotate(_faceUpRotation, _cardSettings.RotationDuration).OnUpdate
             (() =>
@@ -157,11 +173,10 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
                     _cardImage.enabled = true;
             });
     }
-
     private void RotateToFaceDown(bool pPlaySound = true)
     {
         if (pPlaySound)
-            EventManager.GenerateSound(_cardSettings.SoundOnRotate);
+            EventManager.RaiseEvent(new Generate2DSound() { Sound = _cardSettings.SoundOnRotate });
 
         transform.DORotate(_faceDownRotation, _cardSettings.RotationDuration).OnUpdate
              (() =>
@@ -171,20 +186,11 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
              });
     }
 
-    public void RotateInstantly(bool pFaceUp) 
+    private void DisappearCardInstantly()
     {
-        if (pFaceUp) 
-        {
-            transform.rotation = Quaternion.Euler(_faceUpRotation);
-            _cardImage.enabled = true;
-        }
-        else 
-        {
-            transform.rotation = Quaternion.Euler(_faceDownRotation);
-            _cardImage.enabled = false;
-        }
+        _isActive = false;
+        transform.localScale = Vector3.zero;
     }
-
     private void DisappearCard()
     {
         _isActive = false;
@@ -192,5 +198,4 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     }
 
     #endregion
-
 }

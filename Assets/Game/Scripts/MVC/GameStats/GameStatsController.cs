@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static EventManager;
 
 [RequireComponent(typeof(GameStatsView))]
 public class GameStatsController : ControllerBase
@@ -11,12 +9,14 @@ public class GameStatsController : ControllerBase
     [SerializeField] private GameStatsModel _model;
     private GameStatsView _view;
 
+    [Header("Data")]
     private SO_Difficulty _difficultyData;
 
     [Header("Stats")]
     private int _score = 0;
     private int _comboMultiplier = 0;
     private int _movements = 0;
+
     #endregion
 
     #region Monobehaviour
@@ -29,25 +29,26 @@ public class GameStatsController : ControllerBase
 
     private void OnEnable()
     {
-        EventManager.OnStageStarted += StageStarted;
-        EventManager.OnStageFinished += OnStageFinished;
-        EventManager.OnBackMainMenu += BackToMainMenu;
-        EventManager.OnMatchSucess += MatchSuccess;
-        EventManager.OnMatchFail += MatchFail;
+        EventManager.SubscribeEvent<StageStart>(OnStageStart);
+        EventManager.SubscribeEvent<StageFinish>(OnStageFinish);
+        EventManager.SubscribeEvent<BackMainMenu>(OnBackMainMenu);
 
-        EventManager.OnGameStateLoaded += GameStateLoaded;
+        EventManager.SubscribeEvent<MatchSuccess>(OnMatchSuccess);
+        EventManager.SubscribeEvent<MatchFail>(OnMatchFail);
+
+        EventManager.SubscribeEvent<GameLoad>(OnGameLoad);
     }
 
     private void OnDisable()
     {
-        EventManager.OnStageStarted -= StageStarted;
-        EventManager.OnStageFinished -= OnStageFinished;
-        EventManager.OnBackMainMenu -= BackToMainMenu;
-        EventManager.OnMatchSucess -= MatchSuccess;
-        EventManager.OnMatchFail -= MatchFail;
+        EventManager.UnsubscribeEvent<StageStart>(OnStageStart);
+        EventManager.UnsubscribeEvent<StageFinish>(OnStageFinish);
+        EventManager.UnsubscribeEvent<BackMainMenu>(OnBackMainMenu);
 
-        EventManager.OnGameStateLoaded -= GameStateLoaded;
+        EventManager.UnsubscribeEvent<MatchSuccess>(OnMatchSuccess);
+        EventManager.UnsubscribeEvent<MatchFail>(OnMatchFail);
 
+        EventManager.UnsubscribeEvent<GameLoad>(OnGameLoad);
     }
 
     #endregion
@@ -56,48 +57,42 @@ public class GameStatsController : ControllerBase
 
     protected override void Initialize()
     {
-        _view.SetViewAlpha(0);
-        _view.TurnGeneralContainer(false);
-
+        TurnView(false);
         _view.SetData(_model);
     }
 
     #endregion
 
-
     #region Events Callback
 
-    private void StageStarted(StageData pData)
+    private void OnStageStart(StageStart pStageStart)
     {
-        _difficultyData = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(diffuculty => diffuculty.Id == pData.DifficultyId);
+        _difficultyData = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(diffuculty => diffuculty.Id == PersistentDataManager.DifficultyId);
 
         RestartStats();
         _view.TurnBackToMainMenuButton(true);
 
-        _view.SetViewAlpha(1);
-        _view.TurnGeneralContainer(true);
+        TurnView(true);
     }
-
-    private void OnStageFinished()
+    private void OnStageFinish(StageFinish pStageFinish)
     {
         _view.TurnBackToMainMenuButton(false);
     }
 
-    private void BackToMainMenu()
+    private void OnBackMainMenu(BackMainMenu pBackMainMenu)
     {
-        _view.SetViewAlpha(0);
-        _view.TurnGeneralContainer(false);
+        TurnView(false);
     }
-    #endregion
 
-    private void MatchSuccess(SO_Difficulty pDifficulty, List<CardController> pCards)
+    private void OnMatchSuccess(MatchSuccess pMatchSuccess)
     {
         _movements++;
-        _score += pDifficulty.CardMatchPoints;
+        _score += pMatchSuccess.Difficulty.CardMatchPoints;
         _comboMultiplier++;
+
         if (_comboMultiplier >= 2)
         {
-            int comboPoints = pDifficulty.ComboPoints * (_comboMultiplier - 1);
+            int comboPoints = pMatchSuccess.Difficulty.ComboPoints * (_comboMultiplier - 1);
             _score += comboPoints;
             _view.SetComboAmount(comboPoints, _comboMultiplier);
             _view.DisplayComboAnimation();
@@ -106,46 +101,43 @@ public class GameStatsController : ControllerBase
         _view.SetScore(_score);
         _view.SetMovements(_movements);
 
-        EventManager.StatsUpdated(_score, _comboMultiplier, _movements);
+        EventManager.RaiseEvent(new StatsUpdate() { Score = _score, ComboMultiplier = _comboMultiplier, Movements = _movements });
     }
-
-    private void MatchFail(List<CardController> pCards)
+    private void OnMatchFail(MatchFail pMatchFail)
     {
         _movements++;
         _comboMultiplier = 0;
 
         _view.SetMovements(_movements);
 
-        EventManager.StatsUpdated(_score, _comboMultiplier, _movements);
-
+        EventManager.RaiseEvent(new StatsUpdate() { Score = _score, ComboMultiplier = _comboMultiplier, Movements = _movements });
     }
 
-    private void GameStateLoaded(GameState pData) 
+    private void OnGameLoad(GameLoad pGameLoad)
     {
-        _difficultyData = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(diffuculty => diffuculty.Id == pData.DifficultyId);
+        _difficultyData = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(diffuculty => diffuculty.Id == pGameLoad.State.DifficultyId);
 
-        _comboMultiplier = pData.ComboMultiplier;
-        _score = pData.Score;
-        _movements = pData.Movements;
+        _comboMultiplier = pGameLoad.State.ComboMultiplier;
+        _score = pGameLoad.State.Score;
+        _movements = pGameLoad.State.Movements;
 
         _view.SetScore(_score);
         _view.SetMovements(_movements);
         _view.RestartComboAnimation();
-       
+
         _view.TurnBackToMainMenuButton(true);
 
-        _view.SetViewAlpha(1);
-        _view.TurnGeneralContainer(true);
+        TurnView(true);
     }
+
+    #endregion
 
     #region Button callbacks
 
     public void OnBackToMainMenuButtonClick()
     {
-        EventManager.StageLeaved();
-
-        _view.SetViewAlpha(0);
-        _view.TurnGeneralContainer(false);
+        EventManager.RaiseEvent(new LeaveStage());
+        TurnView(false);
     }
 
     #endregion
@@ -159,5 +151,19 @@ public class GameStatsController : ControllerBase
         _view.SetScore(_score);
         _view.SetMovements(_movements);
         _view.RestartComboAnimation();
+    }
+
+    private void TurnView(bool pState)
+    {
+        if (pState)
+        {
+            _view.SetViewAlpha(1);
+            _view.TurnGeneralContainer(true);
+        }
+        else
+        {
+            _view.SetViewAlpha(0);
+            _view.TurnGeneralContainer(false);
+        }
     }
 }

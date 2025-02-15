@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static EventManager;
 
 [RequireComponent(typeof(MainMenuView))]
 public class MainMenuController : ControllerBase
@@ -10,10 +9,10 @@ public class MainMenuController : ControllerBase
 
     [SerializeField] private MainMenuModel _model;
     private MainMenuView _view;
-
+    [Space]
     private SO_BoardSettings _boardSettings;
     private List<SO_Difficulty> _availableDifficulties;
-    
+
     #endregion
 
     #region Monobehaviour
@@ -26,16 +25,16 @@ public class MainMenuController : ControllerBase
 
     private void OnEnable()
     {
-        EventManager.OnGameStarted += StartGame;
-        EventManager.OnStageLeaved += StageLeaved;
-        EventManager.OnBackMainMenu += BackToMainMenu;
+        EventManager.SubscribeEvent<GameStart>(OnGameStart);
+        EventManager.SubscribeEvent<LeaveStage>(OnLeaveStage);
+        EventManager.SubscribeEvent<BackMainMenu>(OnBackMainMenu);
     }
 
     private void OnDisable()
     {
-        EventManager.OnGameStarted -= StartGame;
-        EventManager.OnStageLeaved -= StageLeaved;
-        EventManager.OnBackMainMenu -= BackToMainMenu;
+        EventManager.UnsubscribeEvent<GameStart>(OnGameStart);
+        EventManager.UnsubscribeEvent<LeaveStage>(OnLeaveStage);
+        EventManager.UnsubscribeEvent<BackMainMenu>(OnBackMainMenu);
     }
 
     #endregion
@@ -66,45 +65,50 @@ public class MainMenuController : ControllerBase
 
     #region EventCallbacks
 
-    private void StartGame()
+    private void OnGameStart(GameStart pGameStart)
     {
-        _view.TurnGeneralContainer(true);
-        _view.SetViewAlpha(1);
+        TurnView(true);
     }
 
-    private void StageLeaved() 
+    private void OnLeaveStage(LeaveStage pLeaveStage)
     {
-        _view.TurnGeneralContainer(true);
-        _view.SetViewAlpha(1);
+        TurnView(true);
     }
 
-    private void BackToMainMenu() 
+    private void OnBackMainMenu(BackMainMenu pBackMainMenu)
     {
-        _view.SetViewAlpha(1);
-        _view.TurnGeneralContainer(true);
+        TurnView(true);
     }
 
     #endregion
 
     #region Button Callbacks
 
-    public void OnPlayButtonClick() 
+    public void OnPlayButtonClick()
     {
         PersistentDataManager.ColumnsAmount = _view.ColumnsAmount;
         PersistentDataManager.RowsAmount = _view.RowsAmount;
-
         PersistentDataManager.DifficultyId = _availableDifficulties[_view.DifficultyIndexSelected].Id;
 
-        _view.SetViewAlpha(0);
-        _view.TurnGeneralContainer(false);
+        TurnView(false);
 
-        EventManager.StageStarted(new EventManager.StageData()
-        {
-            ColumnsAmount = PersistentDataManager.ColumnsAmount,
-            RowsAmount = PersistentDataManager.RowsAmount,
-            DifficultyId = PersistentDataManager.DifficultyId,
-        });
+        EventManager.RaiseEvent(new StageStart());
     }
 
     #endregion
+
+    private void TurnView(bool pState)
+    {
+        if (pState)
+        {
+            _view.SetViewAlpha(1);
+            _view.TurnGeneralContainer(true);
+        }
+        else
+        {
+            _view.SetViewAlpha(0);
+            _view.TurnGeneralContainer(false);
+        }
+    }
 }
+

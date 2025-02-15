@@ -7,6 +7,7 @@ public class GameEndView : ViewBase
 
     [SerializeField] private GameObject _generalContainer;
     [SerializeField] private Transform _backToMainMenuButton;
+  
     #endregion
 
     #region Public Methods

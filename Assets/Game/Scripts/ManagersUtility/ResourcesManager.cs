@@ -4,7 +4,6 @@ using UnityEngine;
 public class ResourcesManager
 {
     public static ResourcesManager Instance { get; } = new ResourcesManager();
-
     private Dictionary<string, ScriptableObject> _scriptableObjects = new Dictionary<string, ScriptableObject>();
 
     #region Initialization
@@ -24,9 +23,9 @@ public class ResourcesManager
 
     #region ScriptableObject managements
 
-    private void LoadScriptablesFromFolder(string folderName)
+    private void LoadScriptablesFromFolder(string pFolderName)
     {
-        ScriptableObject[] loadedObjects = Resources.LoadAll<ScriptableObject>(folderName);
+        ScriptableObject[] loadedObjects = Resources.LoadAll<ScriptableObject>(pFolderName);
         foreach (ScriptableObject obj in loadedObjects)
             _scriptableObjects[obj.name] = obj;
     }

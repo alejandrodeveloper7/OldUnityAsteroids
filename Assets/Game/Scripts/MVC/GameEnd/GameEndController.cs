@@ -17,43 +17,61 @@ public class GameEndController : ControllerBase
 
     private void OnEnable()
     {
-        EventManager.OnStageFinished += StageFinished;
+        EventManager.SubscribeEvent<StageFinish>(OnStageFinish);
     }
 
     private void OnDisable()
     {
-        EventManager.OnStageFinished -= StageFinished;
+        EventManager.UnsubscribeEvent<StageFinish>(OnStageFinish);
+    }
+
+    #endregion
+
+    #region Initialization
+
+    protected override void Initialize()
+    {
+        _view.TurnBackToMainMenuButton(false);
+        TurnView(false);
     }
 
     #endregion
 
     #region Event Callbacks
 
-    private async void StageFinished() 
+    private async void OnStageFinish(StageFinish pStageFinish)
     {
-        _view.SetViewAlpha(1);
-        _view.TurnGeneralContainer(true);
+        TurnView(true);
 
         await Task.Delay((int)(_model.TimeBeforeBackToMaimMenuButtonAppears * 1000));
-        _view.TurnBackToMainMenuButton(true,_model.BackToMainMenuButtonApperanceDuration);
+
+        _view.TurnBackToMainMenuButton(true, _model.BackToMainMenuButtonApperanceDuration);
     }
 
     #endregion
 
-    protected override void Initialize()
+    #region Button callbacks
+
+    public void OnBackToMainMenuButtonclick()
     {
         _view.TurnBackToMainMenuButton(false);
-        _view.SetViewAlpha(0);
-        _view.TurnGeneralContainer(false);
+        TurnView(false);
+        EventManager.RaiseEvent(new BackMainMenu());
     }
 
-    public void OnBackToMainMenuButtonclick() 
+    #endregion
+
+    private void TurnView(bool pState)
     {
-        _view.TurnBackToMainMenuButton(false);
-
-        _view.SetViewAlpha(0);
-        _view.TurnGeneralContainer(false);
-
-        EventManager.BackedToMainMenu();
+        if (pState)
+        {
+            _view.SetViewAlpha(1);
+            _view.TurnGeneralContainer(true);
+        }
+        else
+        {
+            _view.SetViewAlpha(0);
+            _view.TurnGeneralContainer(false);
+        }
     }
 }

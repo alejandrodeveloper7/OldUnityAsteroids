@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -19,7 +18,8 @@ public class MainMenuView : ViewBase
     [SerializeField] private Slider _rowsSlider;
     [SerializeField] private TextMeshProUGUI _rowsText;
     public float RowsAmount { get { return _rowsSlider.value; } }
-    [Space]
+
+    [Header("Sliders Configuration")]
     private int _minColumnsValue;
     private int _columnsMinSelectableValue;
     private int _maxColumnsValue;

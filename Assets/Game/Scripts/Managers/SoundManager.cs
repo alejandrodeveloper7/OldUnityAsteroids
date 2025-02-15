@@ -5,13 +5,17 @@ public class SoundManager : MonoBehaviour
 {
     #region Fields
 
+    [Header("Data")]
     private SO_SoundSettings _soundSettings;
     private SO_MusicConfiguration _musicConfiguration;
-    [Space]
-    private int _currentMusicIndex = -1;
-    [Space]
+
+    [Header("Music")]
     private AudioSource _musicSource;
+    private int _currentMusicIndex = -1;
+
+    [Header("Sound")]
     private AudioSourcePool _audioSourcesPool;
+
     #endregion
 
     #region Monobehaviour
@@ -26,22 +30,21 @@ public class SoundManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.OnGenerateSound += GenerateSound;
+        EventManager.SubscribeEvent<Generate2DSound>(OnGenerate2DSound);
     }
 
     private void OnDisable()
     {
-        EventManager.OnGenerateSound -= GenerateSound;
+        EventManager.UnsubscribeEvent<Generate2DSound>(OnGenerate2DSound);
     }
 
     #endregion
 
     #region Events Callbacks
 
-
-    private void GenerateSound(SO_Sound pData)
+    private void OnGenerate2DSound(Generate2DSound pGenerate2DSound)
     {
-        Create2DSound(pData);
+        Create2DSound(pGenerate2DSound.Sound);
     }
 
     #endregion
@@ -67,6 +70,9 @@ public class SoundManager : MonoBehaviour
 
     private async void PlayMusicLoop()
     {
+        if (_musicConfiguration.MusicList.Count == 0)
+            return;
+
         while (this)
         {
             PlayRandomTrack();
@@ -76,8 +82,14 @@ public class SoundManager : MonoBehaviour
 
     private void PlayRandomTrack()
     {
-        int newTrackIndex;
-        newTrackIndex = Random.Range(0, _musicConfiguration.MusicList.Count);
+        int newTrackIndex = 0;
+
+        if (_musicConfiguration.MusicList.Count > 1)
+        {
+            do
+                newTrackIndex = Random.Range(0, _musicConfiguration.MusicList.Count);
+            while (newTrackIndex == _currentMusicIndex);
+        }
 
         _currentMusicIndex = newTrackIndex;
         SO_Sound currentMusicData = _musicConfiguration.MusicList[_currentMusicIndex];

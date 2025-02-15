@@ -6,14 +6,17 @@ public class GameStatsView : ViewBase
 {
     #region Fields
 
+    [Header("General")]
     [SerializeField] private GameObject _generalContainer;
     [SerializeField] private GameObject _BackToMainMenuButton;
 
-    [Space]
+    [Header("Score")]
     [SerializeField] private TextMeshProUGUI _scoreText;
-    [Space]
+
+    [Header("Combo")]
     [SerializeField] private Transform _comboContainer;
     private Sequence _comboSequence;
+    [Space]
     [SerializeField] private TextMeshProUGUI _comboText;
     [SerializeField] private TextMeshProUGUI _comboScoreText;
     [Space]
@@ -22,9 +25,10 @@ public class GameStatsView : ViewBase
     [Header("Values")]
     private float _combosScaleDuration;
     private float _combosDisplayDuration;
+
     #endregion
 
-    #region Public Methods
+    #region Initialization
 
     public void SetData(GameStatsModel pModel)
     {
@@ -32,15 +36,22 @@ public class GameStatsView : ViewBase
         _combosDisplayDuration = pModel.CombosDisplayDuration;
     }
 
+    #endregion
+
+    #region General Elements Management
+
     public void TurnGeneralContainer(bool pState)
     {
         _generalContainer.SetActive(pState);
     }
-
     public void TurnBackToMainMenuButton(bool pSate)
     {
         _BackToMainMenuButton.SetActive(pSate);
     }
+
+    #endregion
+
+    #region StatsManagement
 
     public void SetScore(int pNewScore)
     {
@@ -52,7 +63,6 @@ public class GameStatsView : ViewBase
         _comboText.text = string.Format("Combo x{0}", pComboMultiplier.ToString());
         _comboScoreText.text = pComboPoints.ToString();
     }
-
     public void DisplayComboAnimation()
     {
         if (_comboSequence != null)
@@ -65,13 +75,12 @@ public class GameStatsView : ViewBase
             .AppendInterval(_combosDisplayDuration)
             .Append(_comboContainer.DOScale(0, _combosScaleDuration));
     }
-
     public void RestartComboAnimation()
     {
         if (_comboSequence != null)
             _comboSequence.Kill();
 
-        _comboContainer.localScale = Vector3.zero;    
+        _comboContainer.localScale = Vector3.zero;
     }
 
     public void SetMovements(int pNewMovements)

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SaveDataManager
 {
-    public static void SaveToJson<T>(T pData, string pFileName)
+    public static void GenerateFile<T>(T pData, string pFileName)
     {
         string filePath = Path.Combine(Application.persistentDataPath, pFileName + ".json");
         string json = JsonUtility.ToJson(pData, true);
@@ -11,7 +11,7 @@ public class SaveDataManager
         Debug.Log("File Saved");
     }
 
-    public static T LoadFromJson<T>(string pFileName)
+    public static T LoadFile<T>(string pFileName)
     {
         string filePath = Path.Combine(Application.persistentDataPath, pFileName + ".json");
         if (File.Exists(filePath))
@@ -19,6 +19,7 @@ public class SaveDataManager
             string json = File.ReadAllText(filePath);
             return JsonUtility.FromJson<T>(json);
         }
+
         Debug.Log("File not found");
         return default;
     }
@@ -40,9 +41,7 @@ public class SaveDataManager
             File.Delete(filePath);
             Debug.Log("File Erased");
         }
-        else
-        {
-            Debug.Log("File not found");
-        }
+        else        
+            Debug.Log("File not found");        
     }
 }
