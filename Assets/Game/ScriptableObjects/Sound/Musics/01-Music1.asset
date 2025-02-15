@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: 01-Music1
   m_EditorClassIdentifier: 
   Clip: {fileID: 8300000, guid: e9e3640e3eba2324cbd7363469c3f117, type: 3}
-  Volume: 0.223
+  Volume: 0.15
   PlayOnAwake: 1
   Loop: 1

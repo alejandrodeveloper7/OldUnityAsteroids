@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: 01-CardRotate
   m_EditorClassIdentifier: 
   Clip: {fileID: 8300000, guid: 9c224a9a6056bd1449cbe798931dbc14, type: 3}
-  Volume: 0.144
+  Volume: 0.05
   PlayOnAwake: 0
   Loop: 0

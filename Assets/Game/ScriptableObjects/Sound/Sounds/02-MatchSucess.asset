@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: 02-MatchSucess
   m_EditorClassIdentifier: 
   Clip: {fileID: 8300000, guid: f8b3abb4ecf0ebc428582b1a4f07eef5, type: 3}
-  Volume: 0.486
+  Volume: 0.1
   PlayOnAwake: 0
   Loop: 0

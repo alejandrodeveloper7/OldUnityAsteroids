@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: 04-StageComplete
   m_EditorClassIdentifier: 
   Clip: {fileID: 8300000, guid: 9bf3888e0cfa3b7439de97ddc16af63c, type: 3}
-  Volume: 0.486
+  Volume: 0.1
   PlayOnAwake: 0
   Loop: 0
