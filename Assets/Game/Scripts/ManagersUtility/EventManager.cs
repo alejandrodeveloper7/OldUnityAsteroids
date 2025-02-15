@@ -82,11 +82,11 @@ public class EventManager : MonoBehaviour
         OnStartMatch.Invoke();
     }
 
-    public delegate void MatchSucess();
-    public static event MatchSucess OnMatchSucess = () => { };
-    public static void MatchSucessed()
+    public delegate void MatchSucess(SO_Difficulty pDifficulty);
+    public static event MatchSucess OnMatchSucess = (difficulty) => { };
+    public static void MatchSucessed(SO_Difficulty pDifficulty)
     {
-        OnMatchSucess.Invoke();
+        OnMatchSucess.Invoke(pDifficulty);
     }
 
     public delegate void MatchFail();

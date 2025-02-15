@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0d7b0cbceafbfb4e97669e20c563532, type: 3}
   m_Name: GameStatsModel
   m_EditorClassIdentifier: 
+  CombosScaleDuration: 0.3
+  CombosDisplayDuration: 0.5

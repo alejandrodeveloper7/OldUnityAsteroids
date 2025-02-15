@@ -121,7 +121,7 @@ public class BoardManager : MonoBehaviour
                 pCard.CardMatched();
 
                 _currentRotatedCard = null;
-                EventManager.MatchSucessed();
+                EventManager.MatchSucessed(_currentDifficulty);
 
                 await Task.Delay((int)(_cardSetting.RotationDuration * 1000));
                 EventManager.GenerateSound(_boardSettings.SoundOnMatchSuccess);

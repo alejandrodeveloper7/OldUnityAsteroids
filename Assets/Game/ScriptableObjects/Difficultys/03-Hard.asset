@@ -17,4 +17,4 @@ MonoBehaviour:
   IsActive: 1
   InitialCardsShowTime: 1
   CardMatchPoints: 300
-  ComboPoints: 600
+  ComboPoints: 300
