@@ -151,6 +151,8 @@ public class GameStatsController : ControllerBase
         _view.SetScore(_score);
         _view.SetMovements(_movements);
         _view.RestartComboAnimation();
+
+        EventManager.RaiseEvent(new StatsUpdate() { Score = _score, ComboMultiplier = _comboMultiplier, Movements = _movements });
     }
 
     private void TurnView(bool pState)

@@ -160,7 +160,7 @@ public class BoardManager : MonoBehaviour
 
     }
 
-    private void GenerateNewBoard(List<SO_Card> pCards)
+    private async void GenerateNewBoard(List<SO_Card> pCards)
     {
         CleanBoardCards();
 
@@ -168,7 +168,7 @@ public class BoardManager : MonoBehaviour
             GenerateCard(card);
 
         EventManager.RaiseEvent(new BoardGeneration() { Board = _currentCards });
-        Task.Delay((int)(_boardSettings.SaveGameDelayAfterNewBoardGeneration * 1000));
+        await Task.Delay((int)(_boardSettings.SaveGameDelayAfterNewBoardGeneration * 1000));
         EventManager.RaiseEvent(new SaveGame());
     }
     private void GeneratedLoadedBoard(GameState pGameState) 

@@ -108,7 +108,7 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     {
         transform.SetParent(Parent);
         transform.localPosition = Vector3.zero;
-        ReadyToUse = false;
+        ReadyToUse = true;
         gameObject.SetActive(false);
     }
 
