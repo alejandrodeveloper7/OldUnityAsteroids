@@ -18,8 +18,9 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
     private SO_CardSettings _cardSettings;
 
     private bool _isActive;
-
     private bool _isCleaned; public bool IsCleaned { get { return _isCleaned; } }
+    private bool _isSelected; public bool IsSelected { get { return _isSelected; } set { _isSelected=value; } }
+
 
     private Vector3 _faceUpRotation = new Vector3(0, 180, 0);
     private Vector3 _faceDownRotation = Vector3.zero;
@@ -28,18 +29,36 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     #region Intialization
 
-    public void Initialize(SO_Card pData, SO_CardSettings pSettings)
+    public void Initialize(SO_Card pData, SO_CardSettings pSettings, bool pIsCleaned = false, bool pIsSelected = false, bool pIsNewGame=true)
     {
         _cardData = pData;
         _cardSettings = pSettings;
 
         _cardImage.sprite = pData.Image;
 
-        _isActive = true;
+
+        _isSelected = pIsSelected;
+        if (_isSelected)
+            RotateInstantly(true);
+        else
+            RotateInstantly(false);
+
+        if (pIsNewGame)
+            RotateInstantly(true);
+
+        _isCleaned = pIsCleaned;
+        if (_isCleaned)
+        {
+            _isActive = false;
+            transform.localScale = Vector3.zero;
+        }
+        else
+        {
+            _isActive = true;
+            transform.localScale = Vector3.one;
+        }
 
         ReadyToUse = false;
-        transform.rotation = Quaternion.Euler(_faceUpRotation);
-        transform.localScale=Vector3.one;
         gameObject.SetActive(true);
     }
 
@@ -89,6 +108,7 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     public async void CardMatched()
     {
+        _isSelected = false;
         _isCleaned = true;
         await Task.Delay((int)(_cardSettings.TimeBeforeDissapear * 1000));
         DisappearCard();
@@ -96,9 +116,10 @@ public class CardController : MonoBehaviour, IPooleableGameObject, IPointerClick
 
     public async void CardNotMatched()
     {
+        _isSelected = false;
+        _isActive = true;
         await Task.Delay((int)(_cardSettings.TimeBeforeBackToFaceDown * 1000));
         RotateToFaceDown();
-        _isActive = true;
     }
 
     #endregion

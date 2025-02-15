@@ -5,7 +5,10 @@ public class SO_GeneralSettings : ScriptableObject
 {
     [Header("General")]
     public int TargetFrameRate;
- 
+
     [Header("Game State")]
-    public bool UseSavedGameState; 
+    public string FileName;
+    [Space]
+    public bool SaveGameState;
+    public bool UseSavedGameState;
 }

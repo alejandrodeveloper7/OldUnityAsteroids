@@ -17,6 +17,7 @@ MonoBehaviour:
   ParentPosition: {x: -20, y: 0, z: 0}
   PoolInitialSize: 20
   PoolIncrement: 4
+  SaveGameDelayAfterNewBoardGeneration: 0.1
   SoundOnMatchSuccess: {fileID: 11400000, guid: dbf46d52be03b6041922d7fae7432e16, type: 2}
   SoundOnMatchFailed: {fileID: 11400000, guid: ba3d276563be5e34f82de67b921a1fff, type: 2}
   SoundOnStageComplete: {fileID: 11400000, guid: c743d5606299e0f4d981e6116ebac480, type: 2}

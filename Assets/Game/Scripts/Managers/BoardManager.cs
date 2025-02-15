@@ -38,6 +38,8 @@ public class BoardManager : MonoBehaviour
 
     private void OnEnable()
     {
+        EventManager.OnGameStateLoaded += GameStateLoaded;
+
         EventManager.OnStageStarted += StageStarted;
         EventManager.OnStageLeaved += StageLeaved;
         EventManager.OnCardRotated += CardRotated;
@@ -45,6 +47,8 @@ public class BoardManager : MonoBehaviour
 
     private void OnDisable()
     {
+        EventManager.OnGameStateLoaded -= GameStateLoaded;
+
         EventManager.OnStageStarted -= StageStarted;
         EventManager.OnStageLeaved -= StageLeaved;
         EventManager.OnCardRotated -= CardRotated;
@@ -78,9 +82,26 @@ public class BoardManager : MonoBehaviour
 
     #region Event callbacks
 
+    private void GameStateLoaded(GameState pData) 
+    {
+        _currentDifficulty = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(Difficulty => Difficulty.Id == pData.DifficultyId);
+             
+        foreach(var item in pData.Cards)
+        {
+            CardController newCard= GenerateCard(_availableCards.FirstOrDefault((card) => card.Id == item.CardId),item.IsCleaned,item.IsSelected,false);
+         
+            if(item.IsSelected)
+                _currentRotatedCard= newCard;
+        }
+
+        _gridLayoutResizer.SetData(pData.BoardRows, pData.BoardColumns);
+        _gridLayoutResizer.SetState(true);
+    }
+
     private async void StageStarted(EventManager.StageData pData)
     {
         _currentDifficulty = ResourcesManager.Instance.GetScriptableObject<SO_DifficultyConfiguration>(ScriptableObjectKeys.DIFFICULTY_CONFIGURATION_KEY).DifficultyList.FirstOrDefault(Difficulty => Difficulty.Id == pData.DifficultyId);
+
 
         int totalCardsAmount = Mathf.RoundToInt(pData.RowsAmount * pData.ColumnsAmount);
         List<SO_Card> cardsToUse = GetCardToUse(totalCardsAmount);
@@ -95,10 +116,10 @@ public class BoardManager : MonoBehaviour
         //This is to avoid reproduce the rotation sound multiple times at the same time
         EventManager.GenerateSound(_cardSetting.SoundOnRotate);
         foreach (var item in _currentcards)
-            item.RotateCard(false,false);
+            item.RotateCard(false, false);
     }
 
-    private void StageLeaved() 
+    private void StageLeaved()
     {
         _gridLayoutResizer.SetState(false);
         _currentRotatedCard = null;
@@ -110,7 +131,9 @@ public class BoardManager : MonoBehaviour
         if (_currentRotatedCard == null)
         {
             _currentRotatedCard = pCard;
-            EventManager.MatchStarted();
+            _currentRotatedCard.IsSelected = true;
+            EventManager.MatchStarted(_currentcards);
+            EventManager.SaveData();
         }
         else
         {
@@ -121,12 +144,26 @@ public class BoardManager : MonoBehaviour
                 pCard.CardMatched();
 
                 _currentRotatedCard = null;
-                EventManager.MatchSucessed(_currentDifficulty);
+                EventManager.MatchSucessed(_currentDifficulty, _currentcards);
 
                 await Task.Delay((int)(_cardSetting.RotationDuration * 1000));
                 EventManager.GenerateSound(_boardSettings.SoundOnMatchSuccess);
 
-                CheckBoardComplete();
+                bool boardComplete = CheckBoardComplete();
+
+                if (boardComplete) 
+                {
+                    EventManager.GenerateSound(_boardSettings.SoundOnStageComplete);
+                    Debug.Log("- BOARD CLEANED -");
+
+                    EventManager.StageFinished();
+                }
+                else 
+                {
+                    EventManager.SaveData();
+                }
+
+
             }
             else
             {
@@ -135,7 +172,9 @@ public class BoardManager : MonoBehaviour
                 pCard.CardNotMatched();
 
                 _currentRotatedCard = null;
-                EventManager.MatchFailed();
+                EventManager.MatchFailed(_currentcards);
+
+                EventManager.SaveData();
 
                 await Task.Delay((int)(_cardSetting.RotationDuration * 1000));
                 EventManager.GenerateSound(_boardSettings.SoundOnMatchFailed);
@@ -169,14 +208,19 @@ public class BoardManager : MonoBehaviour
 
         foreach (SO_Card card in pCards)
             GenerateCard(card);
+
+        EventManager.BoardGenerated(_currentcards);
+        Task.Delay((int)(_boardSettings.SaveGameDelayAfterNewBoardGeneration * 1000));
+        EventManager.SaveData();
     }
 
-    private void GenerateCard(SO_Card pCard)
+    private CardController GenerateCard(SO_Card pCard, bool pIsCleaned=false, bool pIsSelected=false, bool pIsNewGame=true)
     {
         CardController newCard = _cardsPool.GetInstance().GetComponent<CardController>();
         newCard.transform.SetParent(_cardsContainer);
-        newCard.Initialize(pCard, _cardSetting);
+        newCard.Initialize(pCard, _cardSetting,pIsCleaned,pIsSelected,pIsNewGame);
         _currentcards.Add(newCard);
+        return newCard;
     }
 
     private void CleanBoardCards()
@@ -187,16 +231,13 @@ public class BoardManager : MonoBehaviour
         _currentcards.Clear();
     }
 
-    private void CheckBoardComplete() 
+    private bool CheckBoardComplete()
     {
         foreach (var item in _currentcards)
             if (item.IsCleaned is false)
-                return;
+                return false;
 
-        EventManager.GenerateSound(_boardSettings.SoundOnStageComplete);
-        Debug.Log("- BOARD CLEANED -");
-
-        EventManager.StageFinished();
+        return true;
     }
 
     #endregion

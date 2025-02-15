@@ -8,8 +8,8 @@ public class GridLayoutResizer : MonoBehaviour
 
     private bool _isActive;
 
-    private int _totalCards; 
-    private int _columns; 
+    private int _totalCards;
+    private int _columns;
     private int _rows;
 
     private void Awake()
@@ -39,10 +39,13 @@ public class GridLayoutResizer : MonoBehaviour
 
         if (_isActive)
             RecalculateCellsSize();
-    }        
+    }
 
     public void RecalculateCellsSize()
     {
+        if (_totalCards == 0)
+            return;
+
         float usableHeight = _gridLayoutRectTransform.rect.height - (_gridLayout.spacing.y * (_rows - 1)) - _gridLayout.padding.top - _gridLayout.padding.bottom;
         float cellHeight = usableHeight / _rows;
 

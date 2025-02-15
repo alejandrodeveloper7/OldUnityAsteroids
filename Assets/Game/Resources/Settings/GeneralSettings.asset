@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: GeneralSettings
   m_EditorClassIdentifier: 
   TargetFrameRate: 60
-  SaveGameState: 0
-  UseSavedGameState: 0
+  FileName: SavedGameState
+  SaveGameState: 1
+  UseSavedGameState: 1

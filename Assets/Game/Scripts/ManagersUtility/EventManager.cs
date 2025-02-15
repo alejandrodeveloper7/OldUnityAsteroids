@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EventManager : MonoBehaviour
@@ -12,14 +13,12 @@ public class EventManager : MonoBehaviour
     }
 
 
-
-    public delegate void LoadGameState();
-    public static event LoadGameState OnGameStateLoaded = () => { };
-    public static void GameStateloaded()
+    public delegate void GameStateLoad(GameState pData);
+    public static event GameStateLoad OnGameStateLoaded = (data) => { };
+    public static void GameStateLoaded(GameState pData)
     {
-        OnGameStateLoaded.Invoke();
+        OnGameStateLoaded.Invoke(pData);
     }
-
 
 
     public delegate void StartStage(StageData pData);
@@ -65,7 +64,7 @@ public class EventManager : MonoBehaviour
     }
 
 
-    public delegate void RotateCard (CardController pCard);
+    public delegate void RotateCard(CardController pCard);
     public static event RotateCard OnCardRotated = (card) => { };
     public static void CardRotated(CardController pCard)
     {
@@ -75,25 +74,25 @@ public class EventManager : MonoBehaviour
 
 
 
-    public delegate void StartMatch();
-    public static event StartMatch OnStartMatch = () => { };
-    public static void MatchStarted()
+    public delegate void StartMatch(List<CardController> pBoard);
+    public static event StartMatch OnStartMatch = (board) => { };
+    public static void MatchStarted(List<CardController> pBoard)
     {
-        OnStartMatch.Invoke();
+        OnStartMatch.Invoke(pBoard);
     }
 
-    public delegate void MatchSucess(SO_Difficulty pDifficulty);
-    public static event MatchSucess OnMatchSucess = (difficulty) => { };
-    public static void MatchSucessed(SO_Difficulty pDifficulty)
+    public delegate void MatchSucess(SO_Difficulty pDifficulty, List<CardController> pBoard);
+    public static event MatchSucess OnMatchSucess = (difficulty, board) => { };
+    public static void MatchSucessed(SO_Difficulty pDifficulty, List<CardController> pBoard)
     {
-        OnMatchSucess.Invoke(pDifficulty);
+        OnMatchSucess.Invoke(pDifficulty, pBoard);
     }
 
-    public delegate void MatchFail();
-    public static event MatchFail OnMatchFail = () => { };
-    public static void MatchFailed()
+    public delegate void MatchFail(List<CardController> pBoard);
+    public static event MatchFail OnMatchFail = (board) => { };
+    public static void MatchFailed(List<CardController> pBoard)
     {
-        OnMatchFail.Invoke();
+        OnMatchFail.Invoke(pBoard);
     }
 
 
@@ -103,5 +102,34 @@ public class EventManager : MonoBehaviour
     public static void GenerateSound(SO_Sound pSound)
     {
         OnGenerateSound.Invoke(pSound);
+    }
+
+    public delegate void DataSave();
+    public static event DataSave OnSaveData = () => { };
+    public static void SaveData()
+    {
+        OnSaveData.Invoke();
+    }
+
+
+    public delegate void BoardGeneration(List<CardController> pBoard);
+    public static event BoardGeneration OnBoardGenerated = (board) => { };
+    public static void BoardGenerated(List<CardController> pBoard)
+    {
+        OnBoardGenerated.Invoke(pBoard);
+    }
+
+    public delegate void StatsUpdate(int pScore, int pComboMultiplier, int pMovements);
+    public static event StatsUpdate OnStatsUpdate = (score, comboMultiplier, movements) => { };
+    public static void StatsUpdated(int pScore, int pComboMultiplier, int pMovement)
+    {
+        OnStatsUpdate.Invoke(pScore, pComboMultiplier, pMovement);
+    }
+
+    public delegate void CleanSavedData();
+    public static event CleanSavedData OnCleanSavedData = () => { };
+    public static void CleanSaveData()
+    {
+        OnCleanSavedData.Invoke();
     }
 }

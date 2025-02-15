@@ -20,8 +20,8 @@ public class GameManager : MonoBehaviour
     {
         if (_generalSettings.UseSavedGameState)
             LoadSavedGameState();
-        else
-            StartGame();
+        else         
+            StartGame();        
     }
 
     private async void StartGame()
@@ -32,6 +32,9 @@ public class GameManager : MonoBehaviour
 
     private void LoadSavedGameState()
     {
-
+        if (SaveDataManager.FileExist(_generalSettings.FileName))
+            EventManager.GameStateLoaded(SaveDataManager.LoadFromJson<GameState>(_generalSettings.FileName));
+        else        
+            StartGame();       
     }
 }

@@ -12,6 +12,9 @@ public class SO_BoardSettings : ScriptableObject
     public int PoolInitialSize;
     public int PoolIncrement;
 
+    [Header("Values")]
+    public float SaveGameDelayAfterNewBoardGeneration;
+
     [Header("Sound")]
     public SO_Sound SoundOnMatchSuccess;
     public SO_Sound SoundOnMatchFailed;

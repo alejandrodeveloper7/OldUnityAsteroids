@@ -1,18 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public class SaveDataManager : MonoBehaviour
+public class SaveDataManager
 {
-    // Start is called before the first frame update
-    void Start()
+    public static void SaveToJson<T>(T pData, string pFileName)
     {
-        
+        string filePath = Path.Combine(Application.persistentDataPath, pFileName + ".json");
+        string json = JsonUtility.ToJson(pData, true);
+        File.WriteAllText(filePath, json);
+        Debug.Log("File Saved");
     }
 
-    // Update is called once per frame
-    void Update()
+    public static T LoadFromJson<T>(string pFileName)
     {
-        
+        string filePath = Path.Combine(Application.persistentDataPath, pFileName + ".json");
+        if (File.Exists(filePath))
+        {
+            string json = File.ReadAllText(filePath);
+            return JsonUtility.FromJson<T>(json);
+        }
+        Debug.Log("File not found");
+        return default;
+    }
+
+    public static bool FileExist(string pFileName)
+    {
+        string filePath = Path.Combine(Application.persistentDataPath, pFileName + ".json");
+        if (File.Exists(filePath))
+            return true;
+        else
+            return false;
+    }
+
+    public static void DeleteFile(string pFileName)
+    {
+        string filePath = Path.Combine(Application.persistentDataPath, pFileName + ".json");
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+            Debug.Log("File Erased");
+        }
+        else
+        {
+            Debug.Log("File not found");
+        }
     }
 }
